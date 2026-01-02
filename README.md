@@ -32,6 +32,8 @@
 
 本仓库已内置 Action：当你推送形如 `v1.2.3` 的 tag 时，会自动构建 Firefox 扩展包并上传到对应 Release。
 
+另外也支持 **手动运行**（Actions 页面会有 “Run workflow” 按钮）：手动运行只会上传构建产物到 **Actions Artifacts**，不会自动发 Release（避免你误发版本）。
+
 ### 产物是什么？
 
 - **XPI**：Firefox 扩展包，文件扩展名是 `.xpi`（本质就是 zip）

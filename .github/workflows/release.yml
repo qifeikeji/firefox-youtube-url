@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      note:
+        description: "手动运行只会构建并上传 Actions Artifact；要发布到 Release 请推送 v*.*.* tag"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -60,7 +66,14 @@ jobs:
             echo "AMO_JWT_ISSUER/AMO_JWT_SECRET 未配置，跳过签名步骤。"
           fi
 
+      - name: Upload build artifacts (Actions)
+        uses: actions/upload-artifact@v4
+        with:
+          name: firefox-xpi
+          path: dist/*
+
       - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           files: |
