@@ -27,6 +27,7 @@ body {
 body {
   width: 420px;
   max-width: 100vw;
+  min-height: 240px;
 }
 
 .header {

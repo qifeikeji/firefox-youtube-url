@@ -1,3 +1,5 @@
+const api = globalThis.browser || globalThis.chrome;
+
 const statusEl = document.getElementById("status");
 const listEl = document.getElementById("list");
 const summaryEl = document.getElementById("summary");
@@ -18,7 +20,7 @@ function showList() {
 }
 
 async function getActiveTab() {
-  const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+  const tabs = await api.tabs.query({ active: true, currentWindow: true });
   return tabs[0];
 }
 
@@ -108,7 +110,7 @@ async function scan() {
   }
 
   try {
-    const items = await browser.tabs.sendMessage(tab.id, { type: "extract_youtube_urls" });
+    const items = await api.tabs.sendMessage(tab.id, { type: "extract_youtube_urls" });
     if (!Array.isArray(items)) throw new Error("bad response");
     render(items);
     showList();

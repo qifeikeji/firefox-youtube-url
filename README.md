@@ -59,4 +59,4 @@ Firefox 若要在用户环境里直接安装/分发，通常需要 **AMO 签名*
 - `AMO_JWT_ISSUER`
 - `AMO_JWT_SECRET`
 
-> 提示：签名需要 `manifest.json` 里存在 `browser_specific_settings.gecko.id`（本项目已设置为 `youtube-url-finder@local`；你也可以改成你自己的域名式 ID）。
+> 提示：签名需要 `manifest.json` 里存在扩展 ID。Firefox 在 Manifest V2 里用 `applications.gecko.id`（本项目已设置为 `youtube-url-finder@local`；你也可以改成你自己的域名式 ID）。
