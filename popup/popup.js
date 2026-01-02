@@ -24,6 +24,18 @@ async function getActiveTab() {
   return tabs[0];
 }
 
+async function ensureContentScript(tabId) {
+  // 在某些场景下（例如扩展刚重载、极少数页面注入延迟），content script 可能尚未就绪
+  // 这里做一次“按需注入”兜底（MV2 支持 executeScript）。
+  if (!api?.tabs?.executeScript) return false;
+  try {
+    await api.tabs.executeScript(tabId, { file: "content/content.js" });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function safeCopy(text) {
   try {
     await navigator.clipboard.writeText(text);
@@ -92,6 +104,11 @@ function render(items) {
 }
 
 async function scan() {
+  if (!api?.tabs?.query) {
+    setStatus("扩展 API 不可用：请重新加载扩展后重试。", "error");
+    return;
+  }
+
   setStatus("正在扫描当前页面…");
   summaryEl.textContent = "";
   copyAllBtn.disabled = true;
@@ -110,7 +127,15 @@ async function scan() {
   }
 
   try {
-    const items = await api.tabs.sendMessage(tab.id, { type: "extract_youtube_urls" });
+    let items;
+    try {
+      items = await api.tabs.sendMessage(tab.id, { type: "extract_youtube_urls" });
+    } catch {
+      // 兜底：尝试注入内容脚本后重试一次
+      const injected = await ensureContentScript(tab.id);
+      if (!injected) throw new Error("content script 不可用（可能是此页面禁止扩展注入）");
+      items = await api.tabs.sendMessage(tab.id, { type: "extract_youtube_urls" });
+    }
     if (!Array.isArray(items)) throw new Error("bad response");
     render(items);
     showList();
@@ -119,7 +144,11 @@ async function scan() {
     }
   } catch (e) {
     // about: / moz-extension: / file: 等页面可能无法注入/访问
-    setStatus("此页面无法访问（Firefox 限制或缺少权限）。请换一个普通网页重试。", "error");
+    const msg = e && e.message ? e.message : String(e || "");
+    setStatus(
+      `此页面无法访问（Firefox 限制或缺少权限）。请换一个普通网页重试。\n${msg ? "原因：" + msg : ""}`,
+      "error"
+    );
   }
 }
 

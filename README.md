@@ -28,6 +28,16 @@
 
 > 注意：Firefox 出于安全限制，`about:`、`moz-extension:`、部分 `file:` 页面可能无法被扩展访问，弹窗会提示不可用。
 
+## 如果扩展弹窗是空白/只有细条怎么办？
+
+油猴脚本能跑，不代表 XPI 扩展一定能跑：扩展的弹窗和网页是 **两个不同上下文**，需要依赖 Firefox 的 **内容脚本注入 + tabs 消息通信**。这层一旦被权限/页面类型/注入时机影响，就可能表现为“没结果/不可用”。
+
+按顺序排查：
+
+1. **换页面**：用普通网页（`http/https`）测试，不要在 `about:`、`moz-extension:`、新标签页等受限页面。
+2. **重载扩展**：`about:debugging#/runtime/this-firefox` 里点 **Reload**（或 Remove 后重新临时加载）。
+3. **看错误原因**：弹窗里会显示失败原因；也可以在 `about:debugging` 对扩展点 **Inspect**，看 Console 报错。
+
 ## 自动打包并上传到 GitHub Release（GitHub Actions）
 
 本仓库已内置 Action：当你推送形如 `v1.2.3` 的 tag 时，会自动构建 Firefox 扩展包并上传到对应 Release。

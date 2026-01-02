@@ -57,6 +57,7 @@ body {
   background: var(--panel2);
   border: 1px solid var(--border);
   border-radius: 10px;
+  white-space: pre-wrap;
 }
 
 .status.error {
