@@ -1,0 +1,67 @@
+name: Build & Release (Firefox XPI)
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install web-ext
+        run: npm install -g web-ext
+
+      - name: Build unsigned XPI (zip)
+        run: |
+          rm -rf dist
+          mkdir -p dist
+          web-ext build \
+            --source-dir . \
+            --artifacts-dir dist \
+            --overwrite-dest \
+            --ignore-files \
+              .git/** \
+              .github/** \
+              dist/** \
+              node_modules/** \
+              terminals/** \
+              README.md
+
+          # web-ext 默认产物是 .zip；为了“Firefox 插件包”的直观性，同时提供 .xpi 副本
+          ZIP="$(ls -1 dist/*.zip | head -n 1)"
+          cp "$ZIP" "${ZIP%.zip}.xpi"
+
+      - name: (Optional) Sign with AMO (unlisted)
+        if: ${{ secrets.AMO_JWT_ISSUER != '' && secrets.AMO_JWT_SECRET != '' }}
+        env:
+          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+          AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: |
+          # 需要 manifest.json 里配置 browser_specific_settings.gecko.id
+          web-ext sign \
+            --source-dir . \
+            --artifacts-dir dist \
+            --channel unlisted \
+            --api-key "$AMO_JWT_ISSUER" \
+            --api-secret "$AMO_JWT_SECRET"
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*
+          generate_release_notes: true
+
+

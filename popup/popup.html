@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>YouTube URL 查找器</title>
+    <link rel="stylesheet" href="./popup.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="title">YouTube URL</div>
+      <div id="summary" class="summary"></div>
+    </header>
+
+    <main class="main">
+      <div id="status" class="status">正在扫描当前页面…</div>
+      <div id="list" class="list" hidden></div>
+    </main>
+
+    <footer class="footer">
+      <button id="rescan" class="btn btn-secondary" type="button">重新扫描</button>
+      <button id="copyAll" class="btn" type="button" disabled>复制全部</button>
+    </footer>
+
+    <script src="./popup.js"></script>
+  </body>
+</html>
+
+

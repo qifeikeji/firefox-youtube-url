@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube URL 查找器",
+  "version": "1.0.0",
+  "description": "从当前页面源码中查找并列出 YouTube 链接（含多种变体），支持一键复制。",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "youtube-url-finder@local",
+      "strict_min_version": "109.0"
+    }
+  },
+  "permissions": ["activeTab"],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_title": "查找 YouTube URL",
+    "default_popup": "popup/popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
+
+
